@@ -1,0 +1,179 @@
+type Value = 
+ variant {
+   "bool": bool;
+   float: float64;
+   "int": int;
+   "nat": nat;
+   "null";
+   "text": text;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type Specification = 
+ record {
+   caption: text;
+   value: text;
+ };
+type Result__1 = 
+ variant {
+   err: Error;
+   ok;
+ };
+type Result = 
+ record {
+   hasMore: bool;
+   rows: vec vec Cell;
+ };
+type Project = 
+ record {
+   category: text;
+   description: text;
+   id: nat;
+   images: vec text;
+   slug: text;
+   specifications: vec Specification;
+   summary: text;
+   title: text;
+   year: nat;
+ };
+type ProductSummary = 
+ record {
+   category: ProductCategory;
+   description: text;
+   id: ProductId;
+   image: text;
+   price: nat;
+   slug: text;
+   title: text;
+ };
+type ProductId = nat;
+type ProductCategory = 
+ variant {
+   ebook;
+   firmware;
+   gerber;
+   guide;
+ };
+type Product = 
+ record {
+   category: ProductCategory;
+   description: text;
+   id: ProductId;
+   image: text;
+   price: nat;
+   slug: text;
+   title: text;
+ };
+type MessageType = 
+ variant {
+   b2bConsultancy;
+   contact;
+ };
+type MessageSummary = 
+ record {
+   company: opt text;
+   createdAt: int;
+   email: text;
+   id: MessageId;
+   messageType: MessageType;
+   name: text;
+   status: MessageStatus;
+   subject: text;
+ };
+type MessageStatus = 
+ variant {
+   archived;
+   new;
+   read;
+ };
+type MessageId = nat;
+type Message = 
+ record {
+   body: text;
+   company: opt text;
+   createdAt: int;
+   email: text;
+   id: MessageId;
+   messageType: MessageType;
+   name: text;
+   status: MessageStatus;
+   subject: text;
+ };
+type Error = 
+ variant {
+   AmbiguousAttribute: record {
+                         field: text;
+                         sources: vec text;
+                       };
+   FrontendOriginMismatch: record {
+                             expected: vec text;
+                             got: text;
+                           };
+   FrontendOriginsNotConfigured;
+   MalformedCandid;
+   MissingField: text;
+   MixedSsoSources: record {
+                      otherKeys: vec text;
+                      ssoKeys: vec text;
+                    };
+   NoAttributes;
+   Stale: record {ageNs: nat;};
+   UnknownNonce;
+   UntrustedSsoSource: record {domain: text;};
+ };
+type Cell = 
+ record {
+   name: text;
+   value: Value;
+ };
+type ArticleSummary = 
+ record {
+   category: text;
+   id: ArticleId;
+   publishedAt: int;
+   readTimeMinutes: nat;
+   slug: text;
+   summary: text;
+   title: text;
+ };
+type ArticleId = nat;
+type Article = 
+ record {
+   category: text;
+   content: text;
+   id: ArticleId;
+   publishedAt: int;
+   readTimeMinutes: nat;
+   slug: text;
+   summary: text;
+   title: text;
+ };
+service : {
+  _initialize_access_control: () -> ();
+  _internet_identity_sign_in_finish: () -> (Result__1);
+  _internet_identity_sign_in_start: () -> (blob);
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  execute: (qJson: text) -> (Result) query;
+  getApiDoc: () -> (text) query;
+  getArticle: (id: ArticleId) -> (opt Article) query;
+  getArticleBySlug: (slug: text) -> (opt Article) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getMessage: (id: MessageId) -> (opt Message) query;
+  getProduct: (id: ProductId) -> (opt Product) query;
+  getProductBySlug: (slug: text) -> (opt Product) query;
+  getProjectBySlug: (slug: text) -> (opt Project) query;
+  isCallerAdmin: () -> (bool) query;
+  listArticles: () -> (vec ArticleSummary) query;
+  listMessages: () -> (vec MessageSummary) query;
+  listProducts: () -> (vec ProductSummary) query;
+  listProjects: () -> (vec Project) query;
+  schema: () -> (text) query;
+  submitMessage: (name: text, email: text, company: opt text, subject: 
+   text, body: text, messageType: MessageType) -> (MessageId);
+  updateMessageStatus: (id: MessageId, status: MessageStatus) ->
+   (opt Message);
+}
